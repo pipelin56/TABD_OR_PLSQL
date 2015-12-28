@@ -1,33 +1,31 @@
-DROP TYPE Tipo_Direccion FORCE;
-DROP TYPE Tipo_Proveedor FORCE;
-DROP TYPE Tipo_Linea_Detalle FORCE;
-DROP TYPE Tipo_Producto FORCE;
-DROP TYPE Tipo_Tabla_Ref_Proveedor FORCE;
-
-CREATE OR REPLACE TYPE Tipo_Pedido;
+CREATE TYPE Tipo_Pedido;
 /
-CREATE OR REPLACE TYPE Tipo_Linea_Detalle;
+CREATE TYPE Tipo_Linea_Detalle;
 /
-CREATE OR REPLACE TYPE Tipo_Tabla_Ref_Linea_Detalle AS TABLE OF REF Tipo_Linea_Detalle;
+CREATE TYPE Tipo_Cliente;
 /
-CREATE OR REPLACE TYPE Tipo_Cliente;
+CREATE TYPE Tipo_Direccion;
 /
-CREATE OR REPLACE TYPE Tipo_Direccion;
+CREATE TYPE Tipo_Producto;
 /
-CREATE OR REPLACE TYPE Tipo_Producto;
+CREATE TYPE Tipo_Proveedor;
 /
-CREATE OR REPLACE TYPE Tipo_Proveedor;
-/
-CREATE OR REPLACE TYPE Tipo_Tabla_Ref_Proveedor AS TABLE OF REF Tipo_Proveedor;
+CREATE TYPE Tipo_Tabla_Ref_Proveedor AS TABLE OF REF Tipo_Proveedor;
 /
 
-
+CREATE OR REPLACE TYPE Tipo_Linea_Detalle AS OBJECT(
+	Cantidad				NUMBER(3),
+	TieneProducto	REF 	Tipo_Producto
+);
+/
+CREATE TYPE Tipo_Tabla_Linea_Detalle AS TABLE OF Tipo_Linea_Detalle;
+/
 CREATE OR REPLACE TYPE Tipo_Pedido AS OBJECT(
 	Id_Pedido				NUMBER(5),		--Realizar con una secuencia
 	Precio_Total			NUMBER(6,2),
 	Fecha_Pedido			DATE,
 	PedidoPor		REF		Tipo_Cliente,
-	TieneLineas				Tipo_Tabla_Ref_Linea_Detalle,
+	TieneLineas				Tipo_Tabla_Linea_Detalle,
 	MEMBER FUNCTION calcularTotalPedido RETURN NUMBER
 );
 /
@@ -39,7 +37,7 @@ CREATE OR REPLACE TYPE Tipo_Direccion AS OBJECT(
 	CP				VARCHAR2(10)
 );
 /
-CREATE OR REPLACE TYPE	Tipo_Lista_Direccion AS VARRAY(5) OF Tipo_Direccion;
+CREATE TYPE Tipo_Lista_Direccion AS VARRAY(5) OF Tipo_Direccion;
 /
 CREATE OR REPLACE TYPE	Tipo_Cliente AS OBJECT(
 	Id_Cliente				NUMBER(5),		--Realizar con secuencia
@@ -67,12 +65,6 @@ CREATE OR REPLACE TYPE Tipo_Proveedor AS OBJECT(
 );
 /
 
-CREATE OR REPLACE TYPE Tipo_Linea_Detalle AS OBJECT(
-	Cantidad				NUMBER(3),
-	TieneProducto	REF 	Tipo_Producto
-);
-/
-
 CREATE OR REPLACE TYPE Tipo_Producto_Software UNDER Tipo_Producto(
 	Licencia		VARCHAR2(15),
 	OVERRIDING MEMBER FUNCTION Imprimir_Producto RETURN VARCHAR2
@@ -84,3 +76,4 @@ CREATE OR REPLACE TYPE Tipo_Producto_Hardware UNDER Tipo_Producto(
 	OVERRIDING MEMBER FUNCTION Imprimir_Producto RETURN VARCHAR2
 );
 /
+
