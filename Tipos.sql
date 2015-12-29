@@ -8,13 +8,13 @@ CREATE OR REPLACE TYPE Tipo_Direccion AS OBJECT(
 	CP				VARCHAR2(10)
 );
 /
---Declaracion adelantada del tipo Tipo_Lista_Direccion que sera un VARRAY de 5 posiciones
+--Declaracion del tipo Tipo_Lista_Direccion que sera un VARRAY de 5 posiciones
 CREATE TYPE Tipo_Lista_Direccion AS VARRAY(5) OF Tipo_Direccion;
 /
 -------------------------------------------Cliente---------------------------------------
---Creación del tipo Tipo_Cliente
+--Creacion del tipo Tipo_Cliente
 CREATE OR REPLACE TYPE	Tipo_Cliente AS OBJECT(
-	Id_Cliente				NUMBER(5),		--Realizar con secuencia
+	Id_Cliente				NUMBER(5),		
 	Dni_Cliente				VARCHAR2(9),
 	Nombre_Cliente			VARCHAR2(15),
 	Apellidos_Cliente		VARCHAR2(30),
@@ -29,10 +29,17 @@ CREATE TABLE Tabla_Cliente OF Tipo_Cliente(
 	Nombre_Cliente NOT NULL,
 	Apellidos_Cliente NOT NULL
 );
+--Definición de secuencia para clave primaria
+CREATE SEQUENCE codClt_seq
+INCREMENT BY 1
+START WITH 1
+MAXVALUE 99999
+NOCACHE
+NOCYCLE;
 
 -------------------------------------------Proveedor-------------------------------------
 CREATE OR REPLACE TYPE Tipo_Proveedor AS OBJECT(
-	Id_Proveedor			NUMBER(3),
+	Id_Proveedor			NUMBER(3),      
 	Nombre_Proveedor		VARCHAR2(30),
 	Direccion_Proveedor		Tipo_Direccion
 );
@@ -42,6 +49,13 @@ CREATE TABLE Tabla_Proveedor OF Tipo_Proveedor(
 	Nombre_Proveedor NOT NULL,
 	Direccion_Proveedor NOT NULL
 );
+--Definición de secuencia para clave primaria
+CREATE SEQUENCE codProv_seq
+INCREMENT BY 1
+START WITH 1
+MAXVALUE 999
+NOCACHE
+NOCYCLE;
 
 -------------------------------------------Linea de Detalle------------------------------
 --Declaracion de Tipo_Producto adelantada por que Tipo_Linea_Detalle lo requiere para su creacion
@@ -64,7 +78,7 @@ CREATE TYPE Tipo_Tabla_Linea_Detalle AS TABLE OF Tipo_Linea_Detalle;
 
 -------------------------------------------Pedido----------------------------------------
 CREATE OR REPLACE TYPE Tipo_Pedido AS OBJECT(
-	Id_Pedido				NUMBER(5),		--Realizar con una secuencia
+	Id_Pedido				NUMBER(7),		
 	Precio_Total			NUMBER(6,2),
 	Fecha_Pedido			DATE,
 	Pedido_Por		REF		Tipo_Cliente,
@@ -79,6 +93,13 @@ CREATE TABLE Tabla_Pedido OF Tipo_Pedido(
 	Fecha_Pedido NOT NULL
 )
 NESTED TABLE Tiene_Lineas STORE AS ListaLineaDeDetalle;
+--Definición de secuencia para clave primaria
+CREATE SEQUENCE codPed_seq
+INCREMENT BY 1
+START WITH 1
+MAXVALUE 9999999
+NOCACHE
+NOCYCLE;
 
 -------------------------------------------Producto--------------------------------------
 --Creacion del tipo que es una tabla de referencias a un Tipo_Proveedor
@@ -86,8 +107,8 @@ CREATE TYPE Tipo_Tabla_Ref_Proveedor AS TABLE OF REF Tipo_Proveedor;
 /
 --Creacion de los tipos
 CREATE OR REPLACE TYPE Tipo_Producto AS OBJECT(
+	Id_Producto			NUMBER(5),			--Realizar con secuencia
 	Stock				NUMBER(3),
-	Id_Producto			NUMBER(3),
 	Nombre_Producto		VARCHAR2(15),
 	Precio_Producto		NUMBER(6,2),
 	Proveido_Por		Tipo_Tabla_Ref_Proveedor,
@@ -112,3 +133,10 @@ CREATE TABLE Tabla_Producto OF Tipo_Producto(
 	Precio_Producto NOT NULL
 )
 NESTED TABLE Proveido_Por STORE AS ProductoProveedor;
+--Definición de secuencia para clave primaria
+CREATE SEQUENCE codProd_seq
+INCREMENT BY 1
+START WITH 1
+MAXVALUE 99999
+NOCACHE
+NOCYCLE;
