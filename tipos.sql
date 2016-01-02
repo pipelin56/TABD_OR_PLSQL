@@ -23,7 +23,8 @@ CREATE OR REPLACE TYPE	Tipo_Cliente AS OBJECT(
 
 --Creacion del tipo Tipo_Proveedor
 CREATE OR REPLACE TYPE Tipo_Proveedor AS OBJECT(
-	Id_Proveedor			NUMBER(3),      
+	Id_Proveedor			NUMBER(3),  
+	Cif_Proveedor			NUMBER(9),    
 	Nombre_Proveedor		VARCHAR2(30),
 	Direccion_Proveedor		Tipo_Direccion
 );
@@ -54,17 +55,14 @@ CREATE OR REPLACE TYPE Tipo_Pedido AS OBJECT(
 );
 /
 
-
-
--------------------------------------------Producto--------------------------------------
 --Creacion del tipo que es una tabla de referencias a un Tipo_Proveedor
 CREATE TYPE Tipo_Tabla_Ref_Proveedor AS TABLE OF REF Tipo_Proveedor;
 /
 --Creacion de los tipos
 CREATE OR REPLACE TYPE Tipo_Producto AS OBJECT(
-	Id_Producto			NUMBER(5),			--Realizar con secuencia
+	Id_Producto			NUMBER(5),			
 	Stock				NUMBER(3),
-	Nombre_Producto		VARCHAR2(15),
+	Nombre_Producto		VARCHAR2(20),
 	Precio_Producto		NUMBER(6,2),
 	Proveido_Por		Tipo_Tabla_Ref_Proveedor,
 	FINAL MEMBER FUNCTION StockProducto RETURN NUMBER, 
@@ -72,8 +70,8 @@ CREATE OR REPLACE TYPE Tipo_Producto AS OBJECT(
 ) NOT FINAL;
 /
 CREATE OR REPLACE TYPE Tipo_Producto_Software UNDER Tipo_Producto(
-	Licencia		VARCHAR2(15),
-	OVERRIDING MEMBER FUNCTION ImprimirProducto RETURN VARCHAR2
+	Licencia		VARCHAR2(15)
+	--OVERRIDING MEMBER FUNCTION ImprimirProducto RETURN VARCHAR2
 );
 /
 CREATE OR REPLACE TYPE Tipo_Producto_Hardware UNDER Tipo_Producto(
