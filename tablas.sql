@@ -25,7 +25,6 @@ CREATE TABLE Tabla_Linea_Detalle OF Tipo_Linea_Detalle(
 CREATE TABLE Tabla_Pedido OF Tipo_Pedido(
 	CONSTRAINT PK_Tabla_Pedido PRIMARY KEY(Id_Pedido),
 	Pedido_Por NOT NULL,
-	Precio_Total NOT NULL,
 	Fecha_Pedido NOT NULL
 )
 NESTED TABLE Tiene_Lineas STORE AS ListaLineaDeDetalle;
