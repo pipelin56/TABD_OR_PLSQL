@@ -24,7 +24,7 @@ CREATE OR REPLACE TYPE	Tipo_Cliente AS OBJECT(
 --Creacion del tipo Tipo_Proveedor
 CREATE OR REPLACE TYPE Tipo_Proveedor AS OBJECT(
 	Id_Proveedor			NUMBER(3),  
-	Cif_Proveedor			NUMBER(9),    
+	Cif_Proveedor			VARCHAR2(9),    
 	Nombre_Proveedor		VARCHAR2(30),
 	Direccion_Proveedor		Tipo_Direccion
 );
@@ -47,7 +47,7 @@ CREATE TYPE Tipo_Tabla_Ref_Proveedor AS TABLE OF REF Tipo_Proveedor;
 CREATE OR REPLACE TYPE Tipo_Producto AS OBJECT(
 	Id_Producto			NUMBER(5),			
 	Stock				NUMBER(3),
-	Nombre_Producto		VARCHAR2(20),
+	Nombre_Producto		VARCHAR2(30),
 	Precio_Producto		NUMBER(6,2),
 	Proveido_Por		Tipo_Tabla_Ref_Proveedor,
 	FINAL MEMBER FUNCTION StockProducto RETURN NUMBER, 
