@@ -69,7 +69,7 @@ END;
 /
 --Creacion del subtipo Software
 CREATE OR REPLACE TYPE Tipo_Producto_Software UNDER Tipo_Producto(
-	Licencia		VARCHAR2(15),
+	Licencia		VARCHAR2(20),
 	OVERRIDING MEMBER FUNCTION ImprimirProducto RETURN VARCHAR2
 );
 /
@@ -83,7 +83,7 @@ END;
 /
 --Creacion del subtipo Hardaware
 CREATE OR REPLACE TYPE Tipo_Producto_Hardware UNDER Tipo_Producto(
-	Tipo_Conexion		VARCHAR2(15),
+	Tipo_Conexion		VARCHAR2(20),
 	OVERRIDING MEMBER FUNCTION ImprimirProducto RETURN VARCHAR2
 );
 /
@@ -91,7 +91,7 @@ CREATE OR REPLACE TYPE Tipo_Producto_Hardware UNDER Tipo_Producto(
 CREATE OR REPLACE TYPE BODY Tipo_Producto_Hardware AS 
     OVERRIDING MEMBER FUNCTION ImprimirProducto RETURN VARCHAR2 IS
 		BEGIN
-			RETURN (SELF AS Tipo_Producto).ImprimirProducto || CHR(10)|| ' Tipo de conexion' || Tipo_Conexion;
+			RETURN (SELF AS Tipo_Producto).ImprimirProducto || CHR(10)|| 'Tipo de conexion: ' || Tipo_Conexion;
 		END;
 END;
 /

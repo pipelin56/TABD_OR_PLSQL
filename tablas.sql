@@ -25,7 +25,8 @@ CREATE TABLE Tabla_Linea_Detalle OF Tipo_Linea_Detalle(
 CREATE TABLE Tabla_Pedido OF Tipo_Pedido(
 	CONSTRAINT PK_Tabla_Pedido PRIMARY KEY(Id_Pedido),
 	Pedido_Por NOT NULL,
-	Fecha_Pedido NOT NULL
+	Fecha_Pedido NOT NULL,
+	SCOPE FOR(Pedido_Por ) IS Tabla_Cliente
 )
 NESTED TABLE Tiene_Lineas STORE AS ListaLineaDeDetalle;
 
@@ -37,6 +38,9 @@ CREATE TABLE Tabla_Producto OF Tipo_Producto(
 	Precio_Producto NOT NULL
 )
 NESTED TABLE Proveido_Por STORE AS ProductoProveedor;
+
+ALTER TABLE ProductoProveedor ADD
+(SCOPE FOR (column_value) IS Tabla_Proveedor);
 
 --Creacion de la tabla Producto Software
 CREATE TABLE Tabla_Prod_Software OF Tipo_Producto_Software
