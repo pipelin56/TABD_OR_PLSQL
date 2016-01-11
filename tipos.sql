@@ -121,7 +121,7 @@ CREATE OR REPLACE TYPE BODY Tipo_Pedido AS
 				--Acontinuacion obtenemos la referencia del producto que tiene cada Linea de detalle.
 				var_ref_prod := Tiene_Lineas(var_indice).Tiene_Producto; 
 				UTL_REF.SELECT_OBJECT(var_ref_prod,var_producto);  --Obtenemos el objeto.
-				var_total := var_total + var_producto.Precio_Producto;
+				var_total := var_total + var_producto.Precio_Producto * Tiene_Lineas(var_indice).Cantidad;
 			END LOOP;
 			RETURN var_total;
 		END;

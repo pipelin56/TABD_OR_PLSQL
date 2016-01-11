@@ -16,7 +16,7 @@ insertar.insertarCliente(
 			Tipo_Lista_Direccion(Tipo_Direccion('Espania','aaaaa','bbbb',7,'110AA'),
 						Tipo_Direccion('Espania','ccccc','bbbb',7,'110AA'),
 						Tipo_Direccion('Espania','ddddd','bbbb',7,'110AA')),
-			'999999M','Fran','Zidane');
+			'999999M','Fran','Ronaldo');
 
 --Insertar proveedores
 insertar.insertarProveedor('AA55F','Proveedor1',
@@ -41,7 +41,21 @@ v_date := SYSDATE;
 insertar.insertarPedido('76080802M',v_date);
 --Insertar Linea Detalle. Se le pasa el DNI del cliente y la Fecha para identificar el pedido del cliente
 insertar.insertarLineaSoft('Antivirus NOD32',1,'76080802M',v_date);
-insertar.insertarLineaHard('Memoria RAM',5,'76080802M',v_date);
+insertar.insertarLineaHard('Memoria RAM 4GB Kingston',5,'76080802M',v_date);
+
+-- Nuevo Pedido. Sumamos  0.001 para que la fecha varie un poco ya que al ejecutarse el script tan rapido, 
+-- las fechas que se toman sobre la variable v_date son iguales y produce un fallo.
+v_date := SYSDATE + 0.001;
+insertar.insertarPedido('76080802M',v_date);
+insertar.insertarLineaSoft('Microsoft Office 2013',1,'76080802M',v_date);
+insertar.insertarLineaHard('Disco Duro 1TB Verbatim',5,'76080802M',v_date);
+insertar.insertarLineaHard('Pendrive 16GB Sandisk',15,'76080802M',v_date);
+
+v_date := SYSDATE + 0.005;
+insertar.insertarPedido('999999M',v_date);
+insertar.insertarLineaSoft('Microsoft Office 2013',1,'999999M',v_date);
+insertar.insertarLineaHard('Disco Duro 1TB Verbatim',5,'999999M',v_date);
+insertar.insertarLineaHard('Pendrive 16GB Sandisk',10,'999999M',v_date);
 
 END;
 /
