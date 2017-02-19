@@ -1,0 +1,12 @@
+@C:\Users\FELIPE\Desktop\TABD\tipos.sql
+@C:\Users\FELIPE\Desktop\TABD\tablas.sql
+@C:\Users\FELIPE\Desktop\TABD\secuencias.sql
+@C:\Users\FELIPE\Desktop\TABD\disparadores.sql
+@C:\Users\FELIPE\Desktop\TABD\pkg_inserciones.sql
+@C:\Users\FELIPE\Desktop\TABD\pkg_eliminar.sql
+@C:\Users\FELIPE\Desktop\TABD\pkg_actualizar.sql
+@C:\Users\FELIPE\Desktop\TABD\inserciones.sql
+@C:\Users\FELIPE\Desktop\TABD\consultar.sql
+@C:\Users\FELIPE\Desktop\TABD\eliminar.sql
+@C:\Users\FELIPE\Desktop\TABD\actualizaciones.sql
+@C:\Users\FELIPE\Desktop\TABD\consultar.sql

@@ -28,7 +28,7 @@ BEGIN
 				                  || v_pvr.Direccion_Proveedor.Numero|| ', '||
 				                     v_pvr.Direccion_Proveedor.CP ||', '||
 				                     v_pvr.Direccion_Proveedor.Ciudad||', '||
-				                     v_pvr.Direccion_Proveedor.Pais);
+				                     v_pvr.Direccion_Proveedor.Pais||'.');
 		
 		DBMS_OUTPUT.PUT_LINE(CHR(10));
 	END LOOP;
@@ -64,7 +64,7 @@ BEGIN
 				                  || v_clt.Direcciones_Cliente(v_indice).Numero|| ', '||
 				                     v_clt.Direcciones_Cliente(v_indice).CP ||', '||
 				                     v_clt.Direcciones_Cliente(v_indice).Ciudad||', '||
-				                     v_clt.Direcciones_Cliente(v_indice).Pais);
+				                     v_clt.Direcciones_Cliente(v_indice).Pais||'.');
 		END LOOP;
 		DBMS_OUTPUT.PUT_LINE(CHR(10));
 

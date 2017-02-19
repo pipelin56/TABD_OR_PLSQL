@@ -42,7 +42,7 @@ CREATE OR REPLACE PACKAGE insertar IS
 	 	v_cif_pvr			Tabla_Proveedor.Cif_Proveedor%TYPE
 	);
 
-	PROCEDURE insertarProveedorProducto(
+	PROCEDURE insertarProveedorProductoSoft(
 		v_nombre_prod 			Tabla_Producto.Nombre_Producto%TYPE,
 		v_cif_pvr				Tabla_Proveedor.Cif_Proveedor%TYPE
 	);
@@ -52,7 +52,11 @@ CREATE OR REPLACE PACKAGE insertar IS
 		v_nombre			Tabla_Producto.Nombre_Producto%TYPE,			
 		v_precio 			Tabla_Producto.Precio_Producto%TYPE,			
 		v_conexion			Tabla_Prod_Hardware.Tipo_Conexion%TYPE,
-		v_nombre_pvr		Tabla_Proveedor.Nombre_Proveedor%TYPE
+		v_cif_pvr			Tabla_Proveedor.Cif_Proveedor%TYPE
+	);
+	PROCEDURE insertarProveedorProductoHard(
+		v_nombre_prod 			Tabla_Producto.Nombre_Producto%TYPE,
+		v_cif_pvr				Tabla_Proveedor.Cif_Proveedor%TYPE
 	);
 
 END insertar;
@@ -69,12 +73,10 @@ PROCEDURE insertarCliente(
         v_nombre          	Tabla_Cliente.Nombre_Cliente%TYPE,
         v_apellido         	Tabla_Cliente.Apellidos_Cliente%TYPE) IS
 		
-		v_dni_lower 		Tabla_Cliente.Dni_Cliente%TYPE;
 		
 	BEGIN
-		v_dni_lower := lower(v_dni); --Por si introduce la letra en Minuscula o Mayuscula
 		INSERT INTO Tabla_Cliente(Id_Cliente,Direcciones_Cliente,Dni_Cliente,Nombre_Cliente,Apellidos_Cliente) 
-			VALUES  (codClt_seq.NEXTVAL,v_direccion,v_dni_lower,v_nombre,v_apellido);
+			VALUES  (codClt_seq.NEXTVAL,v_direccion,lower(v_dni),v_nombre,v_apellido);
 
 		DBMS_OUTPUT.PUT_LINE('Cliente introducido');
 
@@ -92,13 +94,10 @@ PROCEDURE insertarCliente(
 	       	v_cif				Tabla_Proveedor.Cif_Proveedor%TYPE,
         	v_nombre			Tabla_Proveedor.Nombre_Proveedor%TYPE,
         	v_direccion  		Tabla_Proveedor.Direccion_Proveedor%TYPE) IS
-
-			v_cif_lower 		Tabla_Proveedor.Cif_Proveedor%TYPE;
 			
 		BEGIN
-			v_cif_lower := lower(v_cif); --Por si introduce la letra en Minuscula o Mayuscula
 			INSERT INTO Tabla_Proveedor(Id_Proveedor,Cif_Proveedor,Nombre_Proveedor,Direccion_Proveedor) 
-				VALUES  (codProv_seq.NEXTVAL,v_cif_lower,v_nombre,v_direccion);
+				VALUES  (codProv_seq.NEXTVAL,lower(v_cif),v_nombre,v_direccion);
 
 			DBMS_OUTPUT.PUT_LINE('Proveedor insertado');
 
@@ -120,8 +119,23 @@ PROCEDURE insertarCliente(
         	v_fecha				DATE) IS
 
 			v_ref_cli REF Tipo_Cliente;
-
+			v_ref_prd REF Tipo_Producto_Software;
+			v_prod 		  Tipo_Producto_Software;
+			E_NO_STOCK	EXCEPTION;
 		BEGIN
+			--Veamos si hay stock
+			SELECT REF(P) INTO v_ref_prd FROM Tabla_Prod_Software P WHERE P.Nombre_Producto = lower(v_producto);
+			UTL_REF.SELECT_OBJECT(v_ref_prd,v_prod);
+			
+			--Si no hay lanzamos excepcion
+			IF v_prod.StockProducto() < v_cantidad THEN
+				RAISE E_NO_STOCK;
+			END IF;
+			
+			--Si hay, actualizamos el stock de ese producto.
+			UPDATE Tabla_Prod_Software SET Stock = v_prod.StockProducto() - v_cantidad
+				   WHERE Nombre_Producto = lower(v_producto);
+
 			SELECT REF(C) INTO v_ref_cli FROM Tabla_Cliente C WHERE C.Dni_Cliente = lower(v_cliente);
 			
 			INSERT INTO TABLE(SELECT L.Tiene_Lineas 
@@ -129,13 +143,15 @@ PROCEDURE insertarCliente(
 							  WHERE L.Pedido_Por = v_ref_cli
 							  		AND L.Fecha_Pedido = v_fecha)
 					SELECT v_cantidad, REF(P)
-					FROM Tabla_Prod_Software P WHERE P.Nombre_Producto = v_producto;
+					FROM Tabla_Prod_Software P WHERE P.Nombre_Producto = lower(v_producto);
 
-			DBMS_OUTPUT.PUT_LINE('Linea Detalle Software insertada en Pedido');
+			DBMS_OUTPUT.PUT_LINE('Linea Detalle Software insertada en Pedido.');
 
 		EXCEPTION
+			WHEN E_NO_STOCK THEN
+				DBMS_OUTPUT.PUT_LINE('Error. Insuficiente stock para '||v_producto||'.');
 			WHEN OTHERS THEN
-				DBMS_OUTPUT.PUT_LINE('Error al inserta Linea Detalle Software en Pedido');
+				DBMS_OUTPUT.PUT_LINE('Error al insertar Linea Detalle Software en Pedido.');
 
 	END insertarLineaSoft;
 
@@ -149,7 +165,24 @@ PROCEDURE insertarLineaHard(
         	v_fecha				DATE) IS
 
 			v_ref_cli REF Tipo_Cliente;
+			v_ref_prd REF Tipo_Producto_Hardware;
+			v_prod 		  Tipo_Producto_Hardware;
+			E_NO_STOCK	EXCEPTION;
 		BEGIN
+
+			--Veamos si hay stock
+			SELECT REF(P) INTO v_ref_prd FROM Tabla_Prod_Hardware P WHERE P.Nombre_Producto = lower(v_producto);
+			UTL_REF.SELECT_OBJECT(v_ref_prd,v_prod);
+			
+			--Si no hay lanzamos excepcion
+			IF v_prod.StockProducto() < v_cantidad THEN
+				RAISE E_NO_STOCK;
+			END IF;
+			
+			--Si hay, actualizamos el stock de ese producto.
+			UPDATE Tabla_Prod_Hardware SET Stock = v_prod.StockProducto() - v_cantidad
+				   WHERE Nombre_Producto = lower(v_producto);
+
 			SELECT REF(C) INTO v_ref_cli FROM Tabla_Cliente C WHERE C.Dni_Cliente = lower(v_cliente);
 			
 			INSERT INTO TABLE(SELECT L.Tiene_Lineas 
@@ -157,13 +190,15 @@ PROCEDURE insertarLineaHard(
 							  WHERE L.Pedido_Por = v_ref_cli
 							  		AND L.Fecha_Pedido = v_fecha)
 					SELECT v_cantidad, REF(P)
-					FROM Tabla_Prod_Hardware P WHERE P.Nombre_Producto = v_producto;
+					FROM Tabla_Prod_Hardware P WHERE P.Nombre_Producto = lower(v_producto);
 
-			DBMS_OUTPUT.PUT_LINE('Linea Detalle Hardware insertada en Pedido');
+			DBMS_OUTPUT.PUT_LINE('Linea Detalle Hardware insertada en Pedido.');
 
 		EXCEPTION
+			WHEN E_NO_STOCK THEN
+				DBMS_OUTPUT.PUT_LINE('Error. Insuficiente stock para '||v_producto||'.');
 			WHEN OTHERS THEN
-				DBMS_OUTPUT.PUT_LINE('Error al inserta Linea Detalle Hardware en Pedido');
+				DBMS_OUTPUT.PUT_LINE('Error al insertar Linea Detalle Hardware en Pedido.');
 
 	END insertarLineaHard;
 
@@ -180,11 +215,11 @@ PROCEDURE insertarLineaHard(
 			INSERT INTO Tabla_Pedido(Id_Pedido, Fecha_Pedido, Pedido_Por,  Tiene_Lineas)
 				VALUES  (codPed_Seq.NEXTVAL, v_fecha, v_ref_cli, Tipo_Tabla_Linea_Detalle());
 
-			DBMS_OUTPUT.PUT_LINE('Pedido insertado');
+			DBMS_OUTPUT.PUT_LINE('Pedido insertado.');
 
 		 EXCEPTION
 		 	WHEN OTHERS THEN
-				DBMS_OUTPUT.PUT_LINE('Error al insertar un Pedido');
+				DBMS_OUTPUT.PUT_LINE('Error al insertar un Pedido.');
 
 	END insertarPedido;
 
@@ -200,15 +235,14 @@ PROCEDURE insertarLineaHard(
 
 		BEGIN
 			INSERT INTO Tabla_Prod_Software(Id_Producto,Stock,Nombre_Producto,Precio_Producto,Licencia,Proveido_Por)
-			VALUES (codProd_seq.NEXTVAL,v_stock,v_nombre,v_precio,v_licencia,Tipo_Tabla_Ref_Proveedor());
+			VALUES (codProd_seq.NEXTVAL,v_stock,lower(v_nombre),v_precio,v_licencia,Tipo_Tabla_Ref_Proveedor());
 
-			DBMS_OUTPUT.PUT_LINE('Producto Software insertado');
-			insertarProveedorProducto(v_nombre,v_cif_pvr);
+			DBMS_OUTPUT.PUT_LINE('Producto Software insertado.');
+			insertarProveedorProductoSoft(lower(v_nombre),v_cif_pvr);
 
 			EXCEPTION
 				WHEN OTHERS THEN
-					ROLLBACK;
-					DBMS_OUTPUT.PUT_LINE('Error al insertar un Producto Software');
+					DBMS_OUTPUT.PUT_LINE('Error al insertar un Producto Software.');
 
 	END insertarProdSoft;
 
@@ -219,24 +253,23 @@ PROCEDURE insertarProdHard(
 			v_nombre			Tabla_Producto.Nombre_Producto%TYPE,			
 			v_precio 			Tabla_Producto.Precio_Producto%TYPE,
 			v_conexion			Tabla_Prod_Hardware.Tipo_Conexion%TYPE,
-			v_nombre_pvr		Tabla_Proveedor.Nombre_Proveedor%TYPE
+			v_cif_pvr			Tabla_Proveedor.Cif_Proveedor%TYPE
 			) IS
 		BEGIN
 			INSERT INTO Tabla_Prod_Hardware(Id_Producto,Stock,Nombre_Producto,Precio_Producto,Tipo_Conexion, Proveido_Por)
-			VALUES(codProd_seq.NEXTVAL,v_stock,v_nombre,v_precio,v_conexion,Tipo_Tabla_Ref_Proveedor());
+			VALUES(codProd_seq.NEXTVAL,v_stock,lower(v_nombre),v_precio,v_conexion,Tipo_Tabla_Ref_Proveedor());
 
-			DBMS_OUTPUT.PUT_LINE('Producto Hardware insertado');
-
+			DBMS_OUTPUT.PUT_LINE('Producto Hardware insertado.');
+			insertarProveedorProductoHard(lower(v_nombre),v_cif_pvr);
 			EXCEPTION
 				WHEN OTHERS THEN
-					ROLLBACK;
-					DBMS_OUTPUT.PUT_LINE('Error al insertar un Prodcuto Hardware');
+					DBMS_OUTPUT.PUT_LINE('Error al insertar un Prodcuto Hardware.');
 	END insertarProdHard;
 
 -- Precondicion: recibe el nombre de un Producto y el CIF de un su Proveedor
 -- Postcondicion: inserta en la tabla Proveido_Por de tipo Tipo_Tabla_Ref_Proveedor de un Producto X, una referencia del proveedor
 --				  del producto con el nombre pasado por paramentro.
-	PROCEDURE insertarProveedorProducto(
+	PROCEDURE insertarProveedorProductoSoft(
 		v_nombre_prod 			Tabla_Producto.Nombre_Producto%TYPE,
 		v_cif_pvr				Tabla_Proveedor.Cif_Proveedor%TYPE
 		) IS
@@ -247,13 +280,30 @@ PROCEDURE insertarProdHard(
 					WHERE S.Nombre_Producto = v_nombre_prod)
 			SELECT REF(P) FROM Tabla_Proveedor P WHERE P.Cif_Proveedor = v_cif_pvr;
 			
-			DBMS_OUTPUT.PUT_LINE('Proveedor insertado en producto');
+			DBMS_OUTPUT.PUT_LINE('Proveedor insertado en producto.');
 
 			EXCEPTION
 				WHEN OTHERS THEN
-					ROLLBACK;
-					DBMS_OUTPUT.PUT_LINE('Error al insertar un Proveedor a Prodcuto');
-	END insertarProveedorProducto;
+					DBMS_OUTPUT.PUT_LINE('Error al insertar un Proveedor a Prodcuto.');
+	END insertarProveedorProductoSoft;
+
+	PROCEDURE insertarProveedorProductoHard(
+		v_nombre_prod 			Tabla_Producto.Nombre_Producto%TYPE,
+		v_cif_pvr				Tabla_Proveedor.Cif_Proveedor%TYPE
+		) IS
+
+		BEGIN
+			INSERT INTO TABLE(
+					SELECT S.Proveido_Por FROM Tabla_Prod_Hardware S	
+					WHERE S.Nombre_Producto = v_nombre_prod)
+			SELECT REF(P) FROM Tabla_Proveedor P WHERE P.Cif_Proveedor = v_cif_pvr;
+			
+			DBMS_OUTPUT.PUT_LINE('Proveedor insertado en producto.');
+
+			EXCEPTION
+				WHEN OTHERS THEN
+					DBMS_OUTPUT.PUT_LINE('Error al insertar un Proveedor a Prodcuto.');
+	END insertarProveedorProductoHard;
 
 END insertar;
 /

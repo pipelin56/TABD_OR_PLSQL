@@ -33,7 +33,7 @@ insertar.insertarProdSoft(20,'Antivirus Norton 360',40.5,'Software Privado','aa5
 insertar.insertarProdSoft(60,'Microsoft Office 2013',68.75,'Software Privado','zzaa6');
 
 insertar.insertarProdHard(40,'Memoria RAM 4GB Kingston',38.5,'DDR3','zzaa6');
-insertar.insertarProdHard(100,'Pendrive 16GB Sandisk',38.5,'USB 3.0','aa55f');
+insertar.insertarProdHard(100,'Pendrive 16GB Sandisk',18.5,'USB 3.0','aa55f');
 insertar.insertarProdHard(20,'Disco Duro 1TB Verbatim',78.5,'USB 3.0','zzaa6');
 
 --Se crea un nuevo Pedido
@@ -47,8 +47,8 @@ insertar.insertarLineaHard('Memoria RAM 4GB Kingston',5,'76080802M',v_date);
 -- las fechas que se toman sobre la variable v_date son iguales y produce un fallo.
 v_date := SYSDATE + 0.001;
 insertar.insertarPedido('76080802M',v_date);
-insertar.insertarLineaSoft('Microsoft Office 2013',1,'76080802M',v_date);
-insertar.insertarLineaHard('Disco Duro 1TB Verbatim',5,'76080802M',v_date);
+insertar.insertarLineaSoft('Microsoft Office 2013',10000,'76080802M',v_date);
+insertar.insertarLineaHard('Disco Duro 1TB Verbatim',5000,'76080802M',v_date);
 insertar.insertarLineaHard('Pendrive 16GB Sandisk',15,'76080802M',v_date);
 
 v_date := SYSDATE + 0.005;
